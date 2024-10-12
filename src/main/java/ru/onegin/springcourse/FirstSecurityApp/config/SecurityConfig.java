@@ -2,10 +2,17 @@ package ru.onegin.springcourse.FirstSecurityApp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.onegin.springcourse.FirstSecurityApp.security.AuthProviderImpl;
 
 /**
  * @author onegines
@@ -14,26 +21,40 @@ import ru.onegin.springcourse.FirstSecurityApp.security.AuthProviderImpl;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final AuthProviderImpl authProvider;
-
-    public SecurityConfig(AuthProviderImpl authProvider) {
-        this.authProvider = authProvider;
-    }
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/public/**").permitAll()        // Доступ ко всем URL /public/** разрешён для всех
-                        .requestMatchers("/admin/**").hasRole("ADMIN")    // Доступ к /admin/** только для пользователей с ролью ADMIN
-                        .requestMatchers("/user/**").hasRole("USER")      // Доступ к /user/** только для пользователей с ролью USER
-                        .anyRequest().authenticated()                    // Все остальные запросы требуют аутентификации
+                        .requestMatchers("/auth/login", "/auth/registration", "/error").permitAll()
+                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .anyRequest().hasAnyRole("USER", "ADMIN")
                 )
-                .formLogin().permitAll()                             // Разрешить доступ к странице логина для всех
-                .and()
-                .logout().permitAll();                               // Разрешить выход для всех
+                .formLogin(form -> form
+                        .loginPage("/auth/login")
+                        .loginProcessingUrl("/process_login")
+                        .defaultSuccessUrl("/hello", true)
+                        .failureUrl("/auth/login?error")
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/auth/login")
+                );
+
 
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User.withUsername("admin")
+                .password(passwordEncoder.encode("adminpass"))
+                .roles("ADMIN").build());
+        return manager;
+    }
+
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

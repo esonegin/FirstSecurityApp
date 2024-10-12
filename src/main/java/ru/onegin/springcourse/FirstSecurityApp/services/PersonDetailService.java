@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.onegin.springcourse.FirstSecurityApp.models.Person;
-import ru.onegin.springcourse.FirstSecurityApp.repositories.PeopleRapository;
+import ru.onegin.springcourse.FirstSecurityApp.repositories.PeopleRepository;
 import ru.onegin.springcourse.FirstSecurityApp.security.PersonDetails;
 
 import java.util.Optional;
@@ -17,10 +17,10 @@ import java.util.Optional;
  */
 @Service
 public class PersonDetailService implements UserDetailsService {
-    private final PeopleRapository peopleRapository;
+    private final PeopleRepository peopleRapository;
 
     @Autowired
-    public PersonDetailService(PeopleRapository peopleRapository) {
+    public PersonDetailService(PeopleRepository peopleRapository) {
         this.peopleRapository = peopleRapository;
     }
 

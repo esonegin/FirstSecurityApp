@@ -1,10 +1,12 @@
 package ru.onegin.springcourse.FirstSecurityApp.security;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.onegin.springcourse.FirstSecurityApp.models.Person;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  * @author onegines
@@ -19,12 +21,14 @@ public class PersonDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        // SHOW_ACCOUNT, WITHDRAW_MONEY, SEND_MONEY
+        // ROLE_ADMIN, ROLE_USER - это роли
+        return Collections.singletonList(new SimpleGrantedAuthority(person.getRole()));
     }
 
     @Override
     public String getPassword() {
-        return this.person.getPasssword();
+        return this.person.getPassword();
     }
 
     @Override
@@ -52,7 +56,8 @@ public class PersonDetails implements UserDetails {
         return true;
     }
 
-    public Person getPerson(){
+    // Нужно, чтобы получать данные аутентифицированного пользователя
+    public Person getPerson() {
         return this.person;
     }
 }

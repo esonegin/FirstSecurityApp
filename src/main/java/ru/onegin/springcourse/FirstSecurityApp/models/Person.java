@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
-import org.springframework.security.access.method.P;
 
 /**
  * @author onegines
  * @date 07.10.2024
  */
-@Entity(name = "Person")
+@Entity
+@Table(name = "Person")
 public class Person {
     @Id
     @Column(name = "id")
@@ -27,10 +27,13 @@ public class Person {
     private int yearOfBirth;
 
     @Column(name = "password")
-    private String passsword;
+    private String password;
 
-    public Person(){
+    @Column(name = "role")
+    private String role;
 
+    // Конструктор по умолчанию нужен для Spring
+    public Person() {
     }
 
     public Person(String username, int yearOfBirth) {
@@ -62,12 +65,20 @@ public class Person {
         this.yearOfBirth = yearOfBirth;
     }
 
-    public String getPasssword() {
-        return passsword;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasssword(String passsword) {
-        this.passsword = passsword;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     @Override
@@ -76,7 +87,7 @@ public class Person {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", yearOfBirth=" + yearOfBirth +
-                ", passsword='" + passsword + '\'' +
+                ", password='" + password + '\'' +
                 '}';
     }
 }
